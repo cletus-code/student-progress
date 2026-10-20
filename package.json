@@ -1,0 +1,12 @@
+{
+  "name": "ielts-progress",
+  "private": true,
+  "type": "module",
+  "description": "学生雅思备考进度报告（家长登录查看）",
+  "scripts": {
+    "admin": "node scripts/admin.mjs",
+    "essay": "node scripts/essay-metrics.mjs",
+    "serve": "python3 -m http.server 8000 --directory docs"
+  },
+  "engines": { "node": ">=20" }
+}

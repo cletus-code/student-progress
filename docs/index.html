@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>雅思备考进度</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Cpath d='M8 22l5-6 4 3 7-9' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 登录页 -->
+  <div id="login-view" class="login-wrap" hidden>
+    <form id="login-form" class="login-card" autocomplete="on">
+      <div class="brand-mark">IELTS</div>
+      <h1>雅思备考进度报告</h1>
+      <p class="sub">请输入老师提供的账号，查看孩子的学习进度</p>
+      <p id="login-error" class="login-error" role="alert" hidden></p>
+      <label class="field">
+        <span>用户名</span>
+        <input id="username" name="username" autocomplete="username" autocapitalize="off" spellcheck="false" required>
+      </label>
+      <label class="field">
+        <span>密码</span>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+      </label>
+      <button id="login-btn" class="btn-primary" type="submit">登录</button>
+      <p class="login-note">学生数据全部经过加密存储，只有输入正确的用户名和密码才能查看。忘记密码请联系老师。</p>
+    </form>
+  </div>
+
+  <!-- 进度报告 -->
+  <div id="app-view" hidden>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <span class="title">雅思备考进度</span>
+        <nav class="section-nav" aria-label="板块">
+          <a href="#vocab">词汇</a>
+          <a href="#reading">阅读</a>
+          <a href="#listening">听力</a>
+          <a href="#writing">写作</a>
+        </nav>
+        <button id="logout-btn" class="btn-ghost" type="button">退出登录</button>
+      </div>
+    </header>
+    <main id="report"></main>
+  </div>
+
+  <div id="loading-view" class="loading">正在加载…</div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
