@@ -40,10 +40,10 @@ git add docs/data admin && git commit -m "Update progress data" && git push
 Other commands: `list`, `login <code>` (show a parent's login), `set-password <code>`, `remove <code>`,
 `rotate-admin-key --new <key>`. To measure an essay: `node scripts/essay-metrics.mjs essay.txt --task "Task 2"`.
 
-## Demo account
+## Previewing
 
-Username `demo`, password `demo-ielts-2026`. It contains made-up data so you can see the layout.
-Remove it before sharing the site with parents: `node scripts/admin.mjs remove demo`.
+Run `npm run serve` and open http://localhost:8000, then log in with a student's username and password
+(`node scripts/admin.mjs login <code>` shows them).
 
 ## Hosting
 

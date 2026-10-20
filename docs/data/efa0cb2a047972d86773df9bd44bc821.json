@@ -1,0 +1,17 @@
+{
+  "v": 1,
+  "parent": {
+    "salt": "/QHhgRIGmCoRdYhwK6kkcg==",
+    "iterations": 310000,
+    "iv": "zSWeCUB3GzyIXp4k",
+    "ct": "u0Uz3oqZSnprYW6o330Nv/rD896BX6MNM1Nbz4Qlxo6r7aCpE2L95GP+cuPK9+W5"
+  },
+  "admin": {
+    "iv": "aqWb7R+mR91WaBL0",
+    "ct": "opXFzvh/7baQWfM8M93uofstFpOs/wnZ0kjjl7dJ/vwv5g/E0ZqZcDwdSFbcUAtw"
+  },
+  "data": {
+    "iv": "8JJGF7T5rc0NTJRs",
+    "ct": "jtPeh8PMsik6LTmXx6tMIkVdIDhEuIpm4MdJH3RXkAdezn7l7c6HlG5+AsF30ktMFuYulm+84ERtxQHZD48tk/3aAVkSkk+VDAU5bUj6uiiOl2Z0LvjqLqJqS3g9XiM8z4XEzSb2uPjOZJii9lRawLC3McbLr4+Gdpw9jSaegQKOLPNBkZuzy+mTaqS/0240yZt9yjw8YvcHFaU6v6WHxzYG5GwR7q5MlXwUnFQI2RzpChR2NkFSR4B1u3ffLyjknlLhtAWRVJFYCjZUrcjn0fEHNkp3RhtPXEGewQqJZdenJzFBOwzBCSmqAovK7u1+loETZheL1RS6TTXsCSRRw6HVvvQMF3ytMXePEVPn5FyaTUIsWPhZqSxfOk1jBEO/LxBnetNVfpWh9DdKIqxWzZoAvUoGLEsfEBcNuHEx0pm6"
+  }
+}
