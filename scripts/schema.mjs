@@ -11,7 +11,7 @@ export function emptyStudentData(name) {
       teacherNote: "",
     },
     updatedAt: new Date().toISOString().slice(0, 10),
-    vocab: { target: 8000, entries: [] },
+    vocab: { target: null, entries: [] },
     reading: { targetRate: null, entries: [] },
     listening: { targetRate: null, entries: [] },
     writing: { entries: [] },
@@ -76,8 +76,17 @@ export function validateStudentData(d) {
   else {
     if (d.vocab.target !== null && d.vocab.target !== undefined && (!isNum(d.vocab.target) || d.vocab.target <= 0)) problems.push("vocab.target 必须是正数");
     d.vocab.entries.forEach((e, i) => {
-      checkDate(problems, `vocab.entries[${i}].date`, e.date);
-      if (!isNum(e.known) || e.known < 0) problems.push(`vocab.entries[${i}].known 必须是非负数字`);
+      const w = `vocab.entries[${i}]`;
+      checkDate(problems, w + ".date", e.date);
+      if (e.words === undefined && e.known === undefined) problems.push(`${w} 需要 words（单词列表）或 known（词汇量）`);
+      if (e.known !== undefined && (!isNum(e.known) || e.known < 0)) problems.push(`${w}.known 必须是非负数字`);
+      if (e.words !== undefined) {
+        if (!Array.isArray(e.words)) problems.push(`${w}.words 必须是数组`);
+        else e.words.forEach((x, j) => {
+          const word = typeof x === "string" ? x : x && x.w;
+          if (typeof word !== "string" || !word.trim()) problems.push(`${w}.words[${j}] 必须是字符串或 {"w": "单词", "m": "释义"}`);
+        });
+      }
     });
   }
 

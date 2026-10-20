@@ -357,15 +357,15 @@ function recentVsPrevious(values, n = 5) {
 function tilesHtml(data) {
   const tiles = [];
 
-  const vocab = [...data.vocab.entries].sort(byDate);
+  const vocab = vocabSeries(data.vocab);
   if (vocab.length) {
     const latest = vocab[vocab.length - 1];
     const cutoff = toTime(latest.date) - 30 * 86400000;
-    const base = [...vocab].reverse().find((e) => toTime(e.date) <= cutoff) || vocab[0];
-    const gain = latest.known - base.known;
-    tiles.push(`<a class="tile" href="#vocab"><div class="k">词汇量</div><div class="v num">${fmtInt(latest.known)}<small>词</small></div>
-      <div class="d">${base === latest ? "首次记录" : `<span class="${deltaClass(gain)}">${signed(gain, " 词")}</span>（近 30 天）`}</div></a>`);
-  } else tiles.push(`<a class="tile" href="#vocab"><div class="k">词汇量</div><div class="v">—</div><div class="d">暂无记录</div></a>`);
+    const base = [...vocab].reverse().find((e) => toTime(e.date) <= cutoff);
+    const gain = base ? latest.known - base.known : null;
+    tiles.push(`<a class="tile" href="#vocab"><div class="k">已学词汇</div><div class="v num">${fmtInt(latest.known)}<small>个</small></div>
+      <div class="d">${gain === null ? `共 ${vocab.length} 条记录` : `<span class="${deltaClass(gain)}">${signed(gain, " 个")}</span>（近 30 天）`}</div></a>`);
+  } else tiles.push(`<a class="tile" href="#vocab"><div class="k">已学词汇</div><div class="v">—</div><div class="d">暂无记录</div></a>`);
 
   for (const [key, name] of [["reading", "阅读正确率"], ["listening", "听力正确率"]]) {
     const entries = [...data[key].entries].sort(byDate);
@@ -393,27 +393,59 @@ function tilesHtml(data) {
   return `<div class="tiles">${tiles.join("")}</div>`;
 }
 
+// 单词去重用的键：忽略大小写和多余空格（复数 s 在 vocabSeries 里处理）。
+function wordKey(w) {
+  return String(w).toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+// 每条词汇记录可以是一节课的新词列表（words），也可以是一个词汇量数字（known）。
+// 有 words 时累计数由去重后的单词自动计算。
+function vocabSeries(vocab) {
+  const seen = new Set();
+  const has = (k) => seen.has(k) || seen.has(k + "s") || (k.endsWith("s") && seen.has(k.slice(0, -1)));
+  let total = 0;
+  return [...vocab.entries].sort(byDate).map((e) => {
+    const fresh = [];
+    let repeated = 0;
+    for (const item of e.words || []) {
+      const word = typeof item === "string" ? { w: item } : item;
+      const k = wordKey(word.w);
+      if (!k) continue;
+      if (has(k)) repeated++;
+      else {
+        seen.add(k);
+        fresh.push(word);
+      }
+    }
+    total = typeof e.known === "number" ? e.known : total + fresh.length;
+    return { ...e, known: total, fresh, repeated };
+  });
+}
+
 function vocabHtml(vocab) {
-  const entries = [...vocab.entries].sort(byDate);
+  const entries = vocabSeries(vocab);
   let body;
-  if (!entries.length) body = emptyBox("还没有词汇量记录");
+  if (!entries.length) body = emptyBox("还没有词汇记录");
   else {
     const latest = entries[entries.length - 1];
-    const first = entries[0];
     const target = vocab.target;
     const progress = target ? Math.min(1, latest.known / target) : null;
+    const cutoff = toTime(latest.date) - 30 * 86400000;
+    const recent = entries.filter((e) => toTime(e.date) > cutoff).reduce((s, e) => s + e.fresh.length, 0);
+    const lessons = entries.filter((e) => e.fresh.length);
     body = `
       <div class="summary-row">
-        <span>当前词汇量 <b class="num">${fmtInt(latest.known)}</b> 词</span>
-        ${target ? `<span>目标 <b class="num">${fmtInt(target)}</b> 词</span>` : ""}
-        ${entries.length > 1 ? `<span>自 ${esc(fmtDate(first.date))} 起累计 <b class="num">${signed(latest.known - first.known, " 词")}</b></span>` : ""}
+        <span>累计学习 <b class="num">${fmtInt(latest.known)}</b> 个单词/短语</span>
+        ${lessons.length ? `<span>来自 <b class="num">${lessons.length}</b> 节课，平均每节 <b class="num">${Math.round(latest.known / lessons.length)}</b> 个</span>` : ""}
+        <span>近 30 天新增 <b class="num">${fmtInt(recent)}</b> 个</span>
+        ${target ? `<span>目标 <b class="num">${fmtInt(target)}</b> 个</span>` : ""}
       </div>
       ${target ? `<div class="progress" role="progressbar" aria-valuenow="${Math.round(progress * 100)}" aria-valuemin="0" aria-valuemax="100"><div style="width:${(progress * 100).toFixed(1)}%"></div></div>
-      <div class="progress-label"><span>已完成目标的 ${pct(progress)}</span><span>${latest.known >= target ? "已达成目标" : `还差 ${fmtInt(target - latest.known)} 词`}</span></div>` : ""}
-      <div class="sub-h">词汇量变化</div>
+      <div class="progress-label"><span>已完成目标的 ${pct(progress)}</span><span>${latest.known >= target ? "已达成目标" : `还差 ${fmtInt(target - latest.known)} 个`}</span></div>` : ""}
+      <div class="sub-h">累计学习词汇</div>
       ${chartSlot((el) =>
         lineChart(el, {
-          label: "词汇量变化",
+          label: "累计学习词汇",
           area: true,
           target: target || null,
           targetLabel: target ? `目标 ${fmtInt(target)}` : "",
@@ -421,25 +453,24 @@ function vocabHtml(vocab) {
           points: entries.map((e) => ({
             t: toTime(e.date),
             y: e.known,
-            tip: `<b>${esc(fmtDate(e.date))}</b><br>词汇量 <b>${fmtInt(e.known)}</b> 词${e.note ? `<br><span class="muted">${esc(e.note)}</span>` : ""}`,
+            tip: `<b>${esc(fmtDate(e.date))}</b><br>累计 <b>${fmtInt(e.known)}</b> 个${e.fresh.length ? `，本节新学 ${e.fresh.length} 个` : ""}${e.note ? `<br><span class="muted">${esc(e.note)}</span>` : ""}`,
           })),
         })
       )}
       <details class="records">
-        <summary>查看全部词汇记录（${entries.length} 条）</summary>
-        <div class="table-wrap"><table>
-          <thead><tr><th>日期</th><th class="r">词汇量</th><th class="r">变化</th><th>备注</th></tr></thead>
-          <tbody>${entries
-            .map((e, i) => ({ e, diff: i ? e.known - entries[i - 1].known : null }))
-            .reverse()
-            .map(({ e, diff }) => `<tr><td class="nowrap">${esc(fmtDate(e.date))}</td><td class="r">${fmtInt(e.known)}</td>
-              <td class="r ${diff === null ? "" : deltaClass(diff)}">${diff === null ? "—" : signed(diff)}</td><td class="comment">${esc(e.note || "")}</td></tr>`)
-            .join("")}</tbody>
-        </table></div>
+        <summary>查看每节课学习的单词（${entries.length} 条）</summary>
+        <div class="lessons">${[...entries]
+          .reverse()
+          .map((e) => `<div class="lesson">
+            <div class="lesson-head"><b>${esc(fmtDate(e.date))}</b>${e.note ? ` · ${esc(e.note)}` : ""}
+              <span class="hint">新学 ${e.fresh.length} 个${e.repeated ? `，复习 ${e.repeated} 个` : ""} · 累计 ${fmtInt(e.known)}</span></div>
+            ${e.fresh.length ? `<div class="chips">${e.fresh.map((w) => `<span class="chip">${esc(w.w)}${w.m ? `<small>${esc(w.m)}</small>` : ""}</span>`).join("")}</div>` : ""}
+          </div>`)
+          .join("")}</div>
       </details>`;
   }
   return `<section class="section" id="vocab">
-    <div class="section-head"><h2>词汇</h2><span class="hint">词汇量测试结果</span></div>
+    <div class="section-head"><h2>词汇</h2><span class="hint">课堂新学单词，自动去重累计</span></div>
     ${body}
   </section>`;
 }

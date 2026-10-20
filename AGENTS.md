@@ -63,8 +63,13 @@ pass it to the parent.
   },
   "updatedAt": "2026-10-20",       // set automatically by `save`
   "vocab": {
-    "target": 8000,                // 目标词汇量
-    "entries": [ { "date": "2026-10-14", "known": 6120, "note": "" } ]   // known = vocabulary size from a test
+    "target": null,                // optional goal for the cumulative count, or null
+    "entries": [
+      // One entry per class: the new words taught that day. The site de-duplicates across all
+      // entries (case-insensitive, simple plural s) and charts the running total itself.
+      { "date": "2026-10-13", "note": "第 29 课", "words": [ { "w": "regret", "m": "后悔" }, { "w": "attic", "m": "阁楼" }, "glamorous" ] }
+      // Alternatively { "date": …, "known": 6120, "note": "词汇量测试" } sets the count directly (e.g. a vocab-size test).
+    ]
   },
   "reading": {
     "targetRate": 0.8,             // optional target accuracy (0–1) drawn as a dashed line, or null
@@ -101,6 +106,10 @@ pass it to the parent.
   }
 }
 ```
+
+Vocab: when the teacher shares class notes, add every word/phrase from that class's vocab list (with the teacher's
+Chinese meaning in `m` when given; leave `m` out otherwise). Skip speaking questions, essays, quiz sentences and grammar
+notes. Repeating an earlier word is fine. The site counts it as review, not new. Two lists on the same date go in one entry.
 
 Question-type names: reuse the names already in that student's data so the breakdown aggregates correctly.
 Common ones: 阅读 `判断题 (T/F/NG)`, `填空题`, `选择题`, `标题匹配`, `段落信息匹配`, `人名/观点匹配`, `句子配对`;
