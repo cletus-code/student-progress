@@ -333,6 +333,16 @@ function heroHtml(data) {
     ${s.teacherNote ? `<div class="note-card"><span class="label">老师寄语</span><p>${esc(s.teacherNote)}</p></div>` : ""}`;
 }
 
+function groupByDate(sortedEntries) {
+  const groups = [];
+  for (const e of sortedEntries) {
+    const last = groups[groups.length - 1];
+    if (last && last[0].date === e.date) last.push(e);
+    else groups.push([e]);
+  }
+  return groups;
+}
+
 function practiceRate(entries) {
   return entries.map((e) => e.correct / e.total);
 }
@@ -485,12 +495,24 @@ function practiceHtml(key, title, block, bandTable) {
           yFormat: pct,
           target: block.targetRate ?? null,
           targetLabel: block.targetRate ? `目标 ${pct(block.targetRate)}` : "",
-          points: entries.map((e) => {
-            const b = estimateBand(e, bandTable);
+          points: groupByDate(entries).map((day) => {
+            if (day.length === 1) {
+              const e = day[0];
+              const b = estimateBand(e, bandTable);
+              return {
+                t: toTime(e.date),
+                y: e.correct / e.total,
+                tip: `<b>${esc(fmtDate(e.date))}</b><br>${e.material ? `${esc(e.material)}<br>` : ""}正确率 <b>${pct(e.correct / e.total)}</b>（${e.correct}/${e.total}）${b ? `<br>估算分数 ${fmtBand(b)}` : ""}`,
+              };
+            }
+            // 同一天多次练习合并为一个点，按题数加权。
+            const correct = day.reduce((s, e) => s + e.correct, 0);
+            const total = day.reduce((s, e) => s + e.total, 0);
             return {
-              t: toTime(e.date),
-              y: e.correct / e.total,
-              tip: `<b>${esc(fmtDate(e.date))}</b><br>${e.material ? `${esc(e.material)}<br>` : ""}正确率 <b>${pct(e.correct / e.total)}</b>（${e.correct}/${e.total}）${b ? `<br>估算分数 ${fmtBand(b)}` : ""}`,
+              t: toTime(day[0].date),
+              y: correct / total,
+              tip: `<b>${esc(fmtDate(day[0].date))}</b> · ${day.length} 次练习<br>合计正确率 <b>${pct(correct / total)}</b>（${correct}/${total}）<br>` +
+                day.map((e) => `<span class="muted">${esc(e.material || "练习")}：${e.correct}/${e.total}</span>`).join("<br>"),
             };
           }),
         })
