@@ -201,16 +201,22 @@ async function saveOne(index, kek, slug) {
   const envelope = await readEnvelope(s.fileId);
   const rawKey = await unwrapForAdmin(envelope, kek);
   await writeStudentData(s.fileId, rawKey, envelope.parent, kek, data);
+  // 姓名以学生数据为准，同步到管理索引。
+  const renamed = s.name !== data.student.name;
+  s.name = data.student.name;
   console.log(`已加密保存 ${s.name}（${slug}）`);
+  return renamed;
 }
 
 async function cmdSave(slug) {
-  const { index, kek } = await loadIndex(adminKeyFromEnv());
+  const ctx = await loadIndex(adminKeyFromEnv());
   const slugs = slug
     ? [slug]
-    : Object.keys(index.students).filter((s) => existsSync(workPath(s)));
+    : Object.keys(ctx.index.students).filter((s) => existsSync(workPath(s)));
   if (!slugs.length) die("work/ 目录里没有可保存的文件。");
-  for (const s of slugs) await saveOne(index, kek, s);
+  let renamed = false;
+  for (const s of slugs) renamed = (await saveOne(ctx.index, ctx.kek, s)) || renamed;
+  if (renamed) await saveIndex(ctx);
 }
 
 async function cmdLogin(slug) {
