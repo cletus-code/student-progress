@@ -240,6 +240,11 @@ main { max-width: 1080px; margin: 0 auto; padding: 24px 16px 64px; }
 .countdown .k { font-size: 12.5px; color: var(--text-3); }
 .countdown .v { font-size: 22px; font-weight: 700; line-height: 1.2; }
 .countdown .v small { font-size: 13px; font-weight: 500; color: var(--text-2); margin-left: 2px; }
+.countdown .k, .countdown .v { white-space: nowrap; }
+.countdown .v.date { font-size: 17px; line-height: 1.6; }
+.hero-side { display: flex; gap: 12px; align-items: stretch; }
+.lessons-box > div { min-width: 104px; }
+.progress.progress-sm { height: 5px; margin: 5px 0 3px; }
 
 .note-card {
   background: var(--accent-soft);
@@ -411,7 +416,10 @@ footer { text-align: center; color: var(--text-3); font-size: 12.5px; margin-top
 @media (max-width: 560px) {
   .topbar .title { display: none; }
   .hero h1 { font-size: 24px; }
-  .countdown { width: 100%; justify-content: space-between; }
+  .hero-side { width: 100%; flex-wrap: wrap; }
+  .countdown { flex: 1 1 auto; justify-content: space-between; padding: 12px 14px; gap: 14px; }
+  .lessons-box > div { min-width: 84px; }
+  .countdown .v.date { font-size: 15px; }
   .section { padding: 18px 14px 14px; }
   .tile .v { font-size: 22px; }
   .type-row { grid-template-columns: 1fr auto; grid-template-areas: "name val" "bar bar"; gap: 2px 8px; }

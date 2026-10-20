@@ -313,12 +313,25 @@ function heroHtml(data) {
   const meta = [];
   if (s.targetBand) meta.push(`目标总分 <b>${fmtBand(s.targetBand)}</b>`);
   if (s.currentLevel) meta.push(`当前水平：${esc(s.currentLevel)}`);
+  let lessons = "";
+  if (typeof s.lessonsTotal === "number" && typeof s.lessonsDone === "number") {
+    const left = Math.max(0, s.lessonsTotal - s.lessonsDone);
+    const done = Math.min(1, s.lessonsDone / s.lessonsTotal);
+    lessons = `
+      <div class="countdown lessons-box">
+        <div>
+          <div class="k">剩余课程</div><div class="v num">${left}<small>节</small></div>
+          <div class="progress progress-sm" role="progressbar" aria-valuenow="${s.lessonsDone}" aria-valuemin="0" aria-valuemax="${s.lessonsTotal}"><div style="width:${(done * 100).toFixed(1)}%"></div></div>
+          <div class="k num">已上 ${s.lessonsDone} / ${s.lessonsTotal} 节</div>
+        </div>
+      </div>`;
+  }
   let countdown = "";
   if (s.examDate) {
     const days = daysUntil(s.examDate);
     countdown = `
       <div class="countdown">
-        <div><div class="k">考试日期</div><div class="v num" style="font-size:17px;line-height:1.6">${esc(fmtDate(s.examDate))}</div></div>
+        <div><div class="k">考试日期</div><div class="v num date">${esc(fmtDate(s.examDate))}</div></div>
         <div><div class="k">${days >= 0 ? "距离考试" : "考试已过去"}</div><div class="v num">${Math.abs(days)}<small>天</small></div></div>
       </div>`;
   }
@@ -329,7 +342,7 @@ function heroHtml(data) {
         <p class="meta">${meta.map((x) => `<span>${x}</span>`).join("")}</p>
         <p class="meta updated">最近更新：${esc(fmtDate(data.updatedAt))}</p>
       </div>
-      ${countdown}
+      ${lessons || countdown ? `<div class="hero-side">${lessons}${countdown}</div>` : ""}
     </section>
     ${s.teacherNote ? `<div class="note-card"><span class="label">老师寄语</span><p>${esc(s.teacherNote)}</p></div>` : ""}`;
 }

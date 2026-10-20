@@ -58,6 +58,8 @@ pass it to the parent.
     "name": "张小明",
     "targetBand": 7,               // 目标总分, 0–9, or null
     "examDate": "2027-03-20",      // YYYY-MM-DD or null; shows a countdown
+    "lessonsDone": 32,             // classes taken so far; bump by 1 for each new class the teacher reports
+    "lessonsTotal": 40,            // classes in the course package; together they show the 剩余课程 box
     "currentLevel": "总分 6.0（2026年9月模考）",   // free text, Chinese
     "teacherNote": "…"             // 老师寄语 shown at top; Chinese; update when the teacher gives an overall comment
   },

@@ -70,6 +70,9 @@ export function validateStudentData(d) {
     const tb = d.student.targetBand;
     if (tb !== null && tb !== undefined && (!isNum(tb) || tb < 0 || tb > 9)) problems.push("student.targetBand 必须是 0–9 的数字");
     checkDate(problems, "student.examDate", d.student.examDate, { optional: true });
+    const { lessonsDone, lessonsTotal } = d.student;
+    if (lessonsDone !== undefined && lessonsDone !== null && (!Number.isInteger(lessonsDone) || lessonsDone < 0)) problems.push("student.lessonsDone 必须是非负整数");
+    if (lessonsTotal !== undefined && lessonsTotal !== null && (!Number.isInteger(lessonsTotal) || lessonsTotal <= 0)) problems.push("student.lessonsTotal 必须是正整数");
   }
 
   if (!d.vocab || !Array.isArray(d.vocab.entries)) problems.push("vocab.entries 必须是数组");
