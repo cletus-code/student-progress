@@ -1,4 +1,5 @@
-import { fileIdFor, unlockWithPassword, decryptEnvelopeData, toB64, fromB64 } from "./crypto.js";
+import { fileIdFor, unlockWithPassword, decryptEnvelopeData, toB64, fromB64 } from "./crypto.js?v=f2f942ec75";
+import { vocabSeries } from "./vocab.js?v=eb9433e0e4";
 
 const SESSION_KEY = "ielts-session";
 const $ = (id) => document.getElementById(id);
@@ -391,35 +392,6 @@ function tilesHtml(data) {
   } else tiles.push(`<a class="tile" href="#writing"><div class="k">写作</div><div class="v">—</div><div class="d">暂无记录</div></a>`);
 
   return `<div class="tiles">${tiles.join("")}</div>`;
-}
-
-// 单词去重用的键：忽略大小写和多余空格（复数 s 在 vocabSeries 里处理）。
-function wordKey(w) {
-  return String(w).toLowerCase().replace(/\s+/g, " ").trim();
-}
-
-// 每条词汇记录可以是一节课的新词列表（words），也可以是一个词汇量数字（known）。
-// 有 words 时累计数由去重后的单词自动计算。
-function vocabSeries(vocab) {
-  const seen = new Set();
-  const has = (k) => seen.has(k) || seen.has(k + "s") || (k.endsWith("s") && seen.has(k.slice(0, -1)));
-  let total = 0;
-  return [...vocab.entries].sort(byDate).map((e) => {
-    const fresh = [];
-    let repeated = 0;
-    for (const item of e.words || []) {
-      const word = typeof item === "string" ? { w: item } : item;
-      const k = wordKey(word.w);
-      if (!k) continue;
-      if (has(k)) repeated++;
-      else {
-        seen.add(k);
-        fresh.push(word);
-      }
-    }
-    total = typeof e.known === "number" ? e.known : total + fresh.length;
-    return { ...e, known: total, fresh, repeated };
-  });
 }
 
 function vocabHtml(vocab) {

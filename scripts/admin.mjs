@@ -20,6 +20,8 @@ import {
   deriveKey, importDataKey, encryptBytes, decryptBytes, encryptJson, decryptJson,
 } from "../docs/crypto.js";
 import { validateStudentData, emptyStudentData } from "./schema.mjs";
+import { vocabSeries } from "../docs/vocab.js";
+import { stampAssets } from "./stamp.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DATA_DIR = path.join(ROOT, "docs", "data");
@@ -196,6 +198,11 @@ async function saveOne(index, kek, slug) {
   const problems = validateStudentData(data);
   if (problems.length) die(`${slug}.json 数据有问题：\n  - ` + problems.join("\n  - "));
   data.updatedAt = new Date().toISOString().slice(0, 10);
+  // 把累计词汇数写进每条记录，缓存了旧版页面代码的浏览器也能正确显示。
+  const knownByEntry = new Map(vocabSeries(data.vocab).map((e) => [e.date + "\0" + (e.note || ""), e.known]));
+  for (const e of data.vocab.entries) {
+    if (Array.isArray(e.words)) e.known = knownByEntry.get(e.date + "\0" + (e.note || ""));
+  }
   await writeFile(workPath(slug), JSON.stringify(data, null, 2) + "\n");
 
   const envelope = await readEnvelope(s.fileId);
@@ -217,6 +224,7 @@ async function cmdSave(slug) {
   let renamed = false;
   for (const s of slugs) renamed = (await saveOne(ctx.index, ctx.kek, s)) || renamed;
   if (renamed) await saveIndex(ctx);
+  await stampAssets();
 }
 
 async function cmdLogin(slug) {

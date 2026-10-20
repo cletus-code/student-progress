@@ -6,6 +6,7 @@
   "scripts": {
     "admin": "node scripts/admin.mjs",
     "essay": "node scripts/essay-metrics.mjs",
+    "stamp": "node scripts/stamp.mjs",
     "serve": "python3 -m http.server 8000 --directory docs"
   },
   "engines": { "node": ">=20" }

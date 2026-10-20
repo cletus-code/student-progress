@@ -133,4 +133,8 @@ Append the printed JSON object to `writing.entries`. If the teacher gives only a
 - `docs/index.html`, `docs/style.css`, `docs/app.js` are the page (vanilla JS, hand-drawn SVG charts, no external libraries,
   so it loads reliably in mainland China). All UI text must be Simplified Chinese.
 - `docs/crypto.js` is shared by the browser and the Node scripts. Changing its format breaks every existing file.
+- `docs/vocab.js` holds the word de-duplication logic, shared by the page and `admin.mjs save` (which writes each entry's
+  running `known` total so a browser still running cached older page code shows correct numbers).
+- After changing anything in `docs/*.js` or `docs/style.css`, run `npm run stamp` (also run by `save`). It versions the
+  asset URLs (`app.js?v=…`) so browsers never mix old and new code.
 - Preview locally: `npm run serve`, then open http://localhost:8000.
