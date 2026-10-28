@@ -553,6 +553,31 @@ function practiceHtml(key, title, block, bandTable) {
   </section>`;
 }
 
+// 有原文的作文：评分细项、老师点评、原文与中文翻译对照。最新一篇默认展开。
+function essaysHtml(entries) {
+  const withText = entries.filter((e) => e.text).reverse();
+  if (!withText.length) return "";
+  const paras = (t) => esc(t).split(/\n\s*\n/).map((p) => `<p>${p.replace(/\n/g, "<br>")}</p>`).join("");
+  return `<div class="sub-h">作文与批改<span class="hint">原文与中文翻译对照</span></div>
+    <div class="essays">${withText
+      .map((e, i) => `<details class="essay"${i === 0 ? " open" : ""}>
+        <summary>
+          <span class="essay-title">${esc(fmtDate(e.date))} · ${esc(e.task)}${e.topic ? ` · ${esc(e.topic)}` : ""}</span>
+          <span class="essay-meta num">${e.wordCount} 词${typeof e.band === "number" ? ` · <b>${fmtBand(e.band)} 分</b>` : ""}</span>
+        </summary>
+        ${e.criteria ? `<div class="criteria">${Object.entries(e.criteria)
+          .map(([k, v]) => `<div class="criterion"><div class="k">${esc(k)}</div><div class="v num">${fmtBand(v)}</div></div>`)
+          .join("")}</div>` : ""}
+        ${e.comment ? `<p class="essay-comment">${esc(e.comment)}</p>` : ""}
+        ${e.feedback ? `<div class="essay-feedback">${paras(e.feedback)}</div>` : ""}
+        <div class="essay-cols">
+          <div><div class="col-h">原文</div><div class="essay-text" lang="en">${paras(e.text)}</div></div>
+          ${e.translation ? `<div><div class="col-h">中文翻译</div><div class="essay-text">${paras(e.translation)}</div></div>` : ""}
+        </div>
+      </details>`)
+      .join("")}</div>`;
+}
+
 function writingHtml(writing) {
   const entries = [...writing.entries].sort(byDate);
   let body;
@@ -600,7 +625,7 @@ function writingHtml(writing) {
         <span>Task 1 平均 ${avgLine(t1)}</span>
         <span>Task 2 平均 ${avgLine(t2)}</span>
         <span>达到字数要求 <b class="num">${meets}/${entries.length}</b> 篇</span>
-        ${scored.length ? `<span>最近一次老师评分 <b class="num">${fmtBand(scored[scored.length - 1].band)}</b></span>` : ""}
+        ${scored.length ? `<span>最近一次评分 <b class="num">${fmtBand(scored[scored.length - 1].band)}</b></span>` : ""}
       </div>
       <div class="sub-h">每篇作文字数</div>
       <div class="legend">
@@ -610,6 +635,7 @@ function writingHtml(writing) {
       </div>
       ${chartSlot((el) => wordCountChart(el, entries))}
       ${metrics ? `<div class="sub-h">句子与用词复杂度<span class="hint">由程序统一计算，便于前后对比</span></div><div class="mini-grid">${metrics}</div>` : ""}
+      ${essaysHtml(entries)}
       <details class="records">
         <summary>查看全部作文记录（${entries.length} 篇）</summary>
         <div class="table-wrap"><table>

@@ -127,7 +127,11 @@ When the teacher sends an essay, save the text to `work/essay.txt` and run:
 node scripts/essay-metrics.mjs work/essay.txt --task "Task 2" --date 2026-10-20 --topic "题目" --band 6.5 --comment "评语"
 ```
 
-Append the printed JSON object to `writing.entries`. If the teacher gives only a word count (no essay text), record
+Append the printed JSON object to `writing.entries`. When the teacher asks you to assess, translate, or post an essay, also add
+`text` (the essay exactly as written), `translation` (faithful Simplified Chinese), `criteria`
+(`{"任务回应", "连贯与衔接", "词汇丰富程度", "语法多样性及准确性"}` bands; overall `band` = their average rounded to the
+nearest 0.5), and `feedback` (Chinese, 优点 / 需要改进 with quoted examples from the essay). The site shows these under
+作文与批改, with the newest essay open. If the teacher gives only a word count (no essay text), record
 `wordCount` alone and leave the other metrics out. Don't invent them.
 
 ## Site code

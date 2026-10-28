@@ -106,6 +106,13 @@ export function validateStudentData(d) {
       for (const k of ["avgSentenceLength", "complexSentenceRatio", "lexicalDiversity", "band"]) {
         if (e[k] !== undefined && e[k] !== null && !isNum(e[k])) problems.push(`${w}.${k} 必须是数字`);
       }
+      for (const k of ["text", "translation", "feedback", "comment", "topic"]) {
+        if (e[k] !== undefined && e[k] !== null && typeof e[k] !== "string") problems.push(`${w}.${k} 必须是字符串`);
+      }
+      if (e.criteria !== undefined) {
+        if (typeof e.criteria !== "object" || e.criteria === null || Array.isArray(e.criteria)) problems.push(`${w}.criteria 必须是对象，例如 {"任务回应": 6}`);
+        else for (const [k, v] of Object.entries(e.criteria)) if (!isNum(v) || v < 0 || v > 9) problems.push(`${w}.criteria["${k}"] 必须是 0–9 的分数`);
+      }
       checkRate(problems, w + ".complexSentenceRatio", e.complexSentenceRatio);
       checkRate(problems, w + ".lexicalDiversity", e.lexicalDiversity);
     });
