@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>老师后台 · 课表管理</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232a78d6'/%3E%3Cpath d='M8 22l5-6 4 3 7-9' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css?v=37dbdac291">
+</head>
+<body>
+  <!-- 登录 -->
+  <div id="login-view" class="login-wrap">
+    <form id="login-form" class="login-card" autocomplete="off">
+      <div class="brand-mark">老师</div>
+      <h1>老师后台</h1>
+      <p class="sub">管理学生课表，保存后家长页面约 1 分钟内更新</p>
+      <p id="login-error" class="login-error" role="alert" hidden></p>
+      <label class="field">
+        <span>管理密钥</span>
+        <input id="admin-key" type="password" autocomplete="current-password" required>
+      </label>
+      <label class="field">
+        <span>GitHub 令牌</span>
+        <input id="gh-token" type="password" autocomplete="off" spellcheck="false" required placeholder="github_pat_…">
+      </label>
+      <label class="check"><input id="remember" type="checkbox" checked> 在这台设备上记住令牌</label>
+      <button id="login-btn" class="btn-primary" type="submit">登录</button>
+      <details class="help">
+        <summary>如何获取 GitHub 令牌？</summary>
+        <ol>
+          <li>打开 <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a></li>
+          <li>Token name 随便填（例如“课表后台”），Expiration 选 1 年</li>
+          <li>Repository access 选 <b>Only select repositories</b>，只选本网站的仓库</li>
+          <li>Permissions → Repository permissions → <b>Contents</b> 选 <b>Read and write</b></li>
+          <li>点 Generate token，复制以 github_pat_ 开头的令牌粘贴到这里</li>
+        </ol>
+        <p>令牌只能修改这一个仓库。不要在别人的电脑上勾选“记住令牌”。</p>
+      </details>
+    </form>
+  </div>
+
+  <!-- 课表管理 -->
+  <div id="app-view" hidden>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <span class="title">老师后台 · 课表</span>
+        <select id="student-select" class="student-select" aria-label="选择学生"></select>
+        <button id="logout-btn" class="btn-ghost" type="button" style="margin-left:auto">退出</button>
+      </div>
+    </header>
+    <main id="editor"></main>
+    <div id="save-bar" class="save-bar" hidden>
+      <span id="save-msg">有未保存的修改</span>
+      <button id="discard-btn" class="btn-ghost" type="button">放弃修改</button>
+      <button id="save-btn" class="btn-primary" type="button">保存并发布</button>
+    </div>
+  </div>
+
+  <script type="module" src="admin.js?v=7957204c21"></script>
+</body>
+</html>

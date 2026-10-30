@@ -9,6 +9,11 @@ import { fileURLToPath } from "node:url";
 
 const DOCS = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "docs");
 
+// 被其他模块 import、自身不 import 本地文件的模块。
+const LEAVES = ["crypto.js", "vocab.js", "calendar.js", "schema.js"];
+// 入口模块，以及引用它们的页面。
+const ENTRIES = { "app.js": "index.html", "admin.js": "admin.html" };
+
 async function version(file) {
   const body = await readFile(path.join(DOCS, file), "utf8");
   return createHash("sha256").update(body).digest("hex").slice(0, 10);
@@ -26,13 +31,14 @@ async function rewrite(file, refs) {
 }
 
 export async function stampAssets() {
-  // app.js 引用 crypto.js / vocab.js / calendar.js，所以先给它们定版本，再计算 app.js 的版本。
-  await rewrite("app.js", {
-    "crypto.js": await version("crypto.js"),
-    "vocab.js": await version("vocab.js"),
-    "calendar.js": await version("calendar.js"),
-  });
-  await rewrite("index.html", { "app.js": await version("app.js"), "style.css": await version("style.css") });
+  // 先给叶子模块定版本，写进入口模块，再计算入口模块的版本写进页面。
+  const leaves = {};
+  for (const f of LEAVES) leaves[f] = await version(f);
+  const css = await version("style.css");
+  for (const [entry, page] of Object.entries(ENTRIES)) {
+    await rewrite(entry, leaves);
+    await rewrite(page, { [entry]: await version(entry), "style.css": css });
+  }
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) await stampAssets();

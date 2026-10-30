@@ -494,3 +494,57 @@ footer { text-align: center; color: var(--text-3); font-size: 12.5px; margin-top
   .type-row .val { grid-area: val; }
   .type-row .track { grid-area: bar; }
 }
+
+/* ---------- 老师后台 ---------- */
+
+.check { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--text-2); margin: -4px 0 14px; }
+.help { margin-top: 16px; font-size: 13px; color: var(--text-2); }
+.help summary { cursor: pointer; color: var(--accent-strong); }
+.help ol { padding-left: 20px; margin: 8px 0; line-height: 1.8; }
+.help a { color: var(--accent-strong); word-break: break-all; }
+.student-select { height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); padding: 0 8px; }
+
+.ed-lessons { display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: center; margin-top: 10px; font-size: 14px; }
+.ed-lessons .hint { color: var(--text-3); font-size: 12.5px; }
+.ed-add { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px 12px; align-items: end; margin-top: 10px; }
+.ed-add label { display: grid; gap: 4px; font-size: 12.5px; color: var(--text-2); }
+.ed-add .wide { grid-column: span 4; }
+.ed-add .btn-primary { height: 38px; margin: 0; }
+
+.section input, .section select {
+  height: 36px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2);
+  padding: 0 8px; min-width: 0; font-size: 14px;
+}
+.section input:focus, .section select:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+.ed-lessons input { width: 70px; }
+.ed-list { display: grid; gap: 8px; margin-top: 10px; }
+.ed-row { display: grid; grid-template-columns: 150px auto 92px minmax(120px, 1fr) 96px auto; gap: 8px; align-items: center; padding: 8px; border-radius: 10px; background: var(--surface-2); }
+.ed-row input, .ed-row select { background: var(--surface); }
+.ed-row.cancelled { opacity: 0.6; }
+.ed-row.done { background: transparent; border: 1px solid var(--border); }
+.ed-time { display: flex; align-items: center; gap: 4px; color: var(--text-3); }
+.ed-time input { width: 122px; }
+.ed-lesson { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--text-2); }
+.ed-lesson input { width: 52px; }
+.ed-del { color: var(--bad-text); }
+
+.preview { border: 2px dashed var(--border); border-radius: var(--radius); padding: 0 16px 8px; margin-bottom: 80px; }
+
+.save-bar {
+  position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 20;
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 18px;
+  background: var(--text); color: var(--surface); border-radius: 999px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+  max-width: calc(100vw - 32px);
+}
+.save-bar .btn-primary { width: auto; height: 36px; padding: 0 18px; margin: 0; border-radius: 999px; }
+.save-bar .btn-ghost { background: transparent; color: inherit; border-color: color-mix(in srgb, var(--surface) 40%, transparent); }
+
+@media (max-width: 820px) {
+  .ed-add { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ed-add .wide { grid-column: span 2; }
+  .ed-row { grid-template-columns: 1fr 1fr; }
+  .ed-row .ed-time { grid-column: span 2; }
+  .ed-row .ed-time input { flex: 1; }
+  .ed-row input[data-f="note"] { grid-column: span 2; }
+  .save-bar { left: 16px; right: 16px; transform: none; border-radius: 16px; flex-wrap: wrap; }
+}

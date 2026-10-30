@@ -148,6 +148,11 @@ nearest 0.5), and `feedback` (Chinese, 优点 / 需要改进 with quoted example
 - `docs/index.html`, `docs/style.css`, `docs/app.js` are the page (vanilla JS, hand-drawn SVG charts, no external libraries,
   so it loads reliably in mainland China). All UI text must be Simplified Chinese.
 - `docs/crypto.js` is shared by the browser and the Node scripts. Changing its format breaks every existing file.
+- `docs/admin.html` + `docs/admin.js` are the teacher's 老师后台 (not linked from the parent page): log in with the admin
+  key plus a fine-grained GitHub token (Contents: read/write on this repo only), edit `schedule` / `lessonsDone` /
+  `lessonsTotal`, and it re-encrypts in the browser and commits via the GitHub API. Its edits land on `main`, so
+  `git pull` before you start editing data.
+- `docs/schema.js` is the validator shared by the admin page and `scripts/admin.mjs` (`scripts/schema.mjs` re-exports it).
 - `docs/calendar.js` renders the 课表 tab (`#calendar`): month grid, upcoming list, history, and a .ics download.
 - `docs/vocab.js` holds the word de-duplication logic, shared by the page and `admin.mjs save` (which writes each entry's
   running `known` total so a browser still running cached older page code shows correct numbers).
