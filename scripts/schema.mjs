@@ -96,6 +96,21 @@ export function validateStudentData(d) {
   checkPractice(problems, "reading", d.reading);
   checkPractice(problems, "listening", d.listening);
 
+  if (d.schedule !== undefined) {
+    if (!Array.isArray(d.schedule)) problems.push("schedule 必须是数组");
+    else d.schedule.forEach((e, i) => {
+      const w = `schedule[${i}]`;
+      checkDate(problems, w + ".date", e.date);
+      for (const k of ["start", "end"]) {
+        if (e[k] !== undefined && e[k] !== null && !/^([01]\d|2[0-3]):[0-5]\d$/.test(e[k])) problems.push(`${w}.${k} 必须是 24 小时制 HH:MM，例如 "16:00"`);
+      }
+      if (e.end && !e.start) problems.push(`${w} 有 end 但没有 start`);
+      if (e.start && e.end && e.end <= e.start) problems.push(`${w}.end 必须晚于 start`);
+      if (e.status !== undefined && !["planned", "done", "cancelled"].includes(e.status)) problems.push(`${w}.status 只能是 planned / done / cancelled`);
+      if (e.lesson !== undefined && e.lesson !== null && (!Number.isInteger(e.lesson) || e.lesson <= 0)) problems.push(`${w}.lesson 必须是正整数`);
+    });
+  }
+
   if (!d.writing || !Array.isArray(d.writing.entries)) problems.push("writing.entries 必须是数组");
   else {
     d.writing.entries.forEach((e, i) => {

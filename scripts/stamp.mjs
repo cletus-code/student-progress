@@ -26,8 +26,12 @@ async function rewrite(file, refs) {
 }
 
 export async function stampAssets() {
-  // app.js 引用 crypto.js / vocab.js，所以先给它们定版本，再计算 app.js 的版本。
-  await rewrite("app.js", { "crypto.js": await version("crypto.js"), "vocab.js": await version("vocab.js") });
+  // app.js 引用 crypto.js / vocab.js / calendar.js，所以先给它们定版本，再计算 app.js 的版本。
+  await rewrite("app.js", {
+    "crypto.js": await version("crypto.js"),
+    "vocab.js": await version("vocab.js"),
+    "calendar.js": await version("calendar.js"),
+  });
   await rewrite("index.html", { "app.js": await version("app.js"), "style.css": await version("style.css") });
 }
 

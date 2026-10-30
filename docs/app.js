@@ -1,5 +1,6 @@
 import { fileIdFor, unlockWithPassword, decryptEnvelopeData, toB64, fromB64 } from "./crypto.js?v=f2f942ec75";
 import { vocabSeries } from "./vocab.js?v=eb9433e0e4";
+import { renderCalendar } from "./calendar.js?v=12a87b2523";
 
 const SESSION_KEY = "ielts-session";
 const $ = (id) => document.getElementById(id);
@@ -723,10 +724,32 @@ function showLoginError(msg) {
   el.hidden = !msg;
 }
 
+// 顶部的“课表”是独立视图（#calendar），其余导航链接回到进度报告并滚动到对应板块。
+let currentData = null;
+
+function route() {
+  if (!currentData) return;
+  const onCalendar = location.hash === "#calendar";
+  $("report").hidden = onCalendar;
+  $("calendar").hidden = !onCalendar;
+  document.querySelectorAll(".section-nav a").forEach((a) => a.classList.toggle("active", onCalendar && a.hash === "#calendar"));
+  if (onCalendar) {
+    renderCalendar($("calendar"), currentData);
+    window.scrollTo(0, 0);
+  } else {
+    renderCharts();
+    const target = location.hash && document.getElementById(location.hash.slice(1));
+    if (target) target.scrollIntoView();
+  }
+}
+window.addEventListener("hashchange", route);
+
 async function openReport(envelope, rawKey) {
   const data = await decryptEnvelopeData(envelope, rawKey);
+  currentData = data;
   show("app");
   renderReport(data);
+  route();
 }
 
 $("login-form").addEventListener("submit", async (ev) => {
@@ -760,7 +783,9 @@ $("login-form").addEventListener("submit", async (ev) => {
 
 $("logout-btn").addEventListener("click", () => {
   clearSession();
+  currentData = null;
   $("report").innerHTML = "";
+  $("calendar").innerHTML = "";
   document.title = "雅思备考进度";
   show("login");
   $("username").focus();

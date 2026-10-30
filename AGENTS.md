@@ -64,6 +64,12 @@ pass it to the parent.
     "teacherNote": "…"             // 老师寄语 shown at top; Chinese; update when the teacher gives an overall comment
   },
   "updatedAt": "2026-10-20",       // set automatically by `save`
+  "schedule": [                    // 课表 tab (view-only for parents). One entry per class.
+    { "date": "2026-10-29", "lesson": 36, "status": "done" },
+    { "date": "2026-11-02", "start": "16:00", "end": "17:30", "lesson": 37, "note": "听力模考" }
+    // status: "planned" | "done" | "cancelled"; omitted = done if the date has passed, else planned.
+    // start/end are 24-hour HH:MM local time and optional. lesson = the teacher's class number, optional.
+  ],
   "vocab": {
     "target": null,                // optional goal for the cumulative count, or null
     "entries": [
@@ -113,6 +119,9 @@ Vocab: when the teacher shares class notes, add every word/phrase from that clas
 Chinese meaning in `m` when given; leave `m` out otherwise). Skip speaking questions, essays, quiz sentences and grammar
 notes. Repeating an earlier word is fine. The site counts it as review, not new. Two lists on the same date go in one entry.
 
+Schedule: when the teacher schedules, moves or cancels a class, edit `schedule` (set `status: "cancelled"` rather
+than deleting, so parents see the change). When a class happens, mark it `done` and bump `student.lessonsDone`.
+
 Question-type names: reuse the names already in that student's data so the breakdown aggregates correctly.
 Common ones: 阅读 `判断题 (T/F/NG)`, `填空题`, `选择题`, `标题匹配`, `段落信息匹配`, `人名/观点匹配`, `句子配对`;
 听力 `表格/笔记填空`, `单选题`, `多选题`, `配对题`, `地图题`.
@@ -139,6 +148,7 @@ nearest 0.5), and `feedback` (Chinese, 优点 / 需要改进 with quoted example
 - `docs/index.html`, `docs/style.css`, `docs/app.js` are the page (vanilla JS, hand-drawn SVG charts, no external libraries,
   so it loads reliably in mainland China). All UI text must be Simplified Chinese.
 - `docs/crypto.js` is shared by the browser and the Node scripts. Changing its format breaks every existing file.
+- `docs/calendar.js` renders the 课表 tab (`#calendar`): month grid, upcoming list, history, and a .ics download.
 - `docs/vocab.js` holds the word de-duplication logic, shared by the page and `admin.mjs save` (which writes each entry's
   running `known` total so a browser still running cached older page code shows correct numbers).
 - After changing anything in `docs/*.js` or `docs/style.css`, run `npm run stamp` (also run by `save`). It versions the
